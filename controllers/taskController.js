@@ -52,12 +52,6 @@ exports.createTask = async (req, res) => {
 			})
 		}
 
-		if (!req.body.Status) {
-			return res.error({
-				msg: '任务状态不能为空'
-			})
-		}
-
 		const validStatusValues = [0, 1, 2, 3];
 		if (!validStatusValues.includes(parseInt(req.body.Status))) {
 			return res.error({
