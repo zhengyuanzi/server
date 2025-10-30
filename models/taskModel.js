@@ -6,7 +6,7 @@ class Task {
     const whereClause = params.whereConditions.length > 0
       ? `WHERE ${params.whereConditions.join(' AND ')}`
       : '';
-    const dataSql = `SELECT Id, TaskId, TaskName, Prototype, Status, Workload, DATE_FORMAT(CreateTime, '%Y-%m-%d %H:%i:%s') AS CreateTime, DATE_FORMAT(UpdateTime, '%Y-%m-%d %H:%i:%s') AS UpdateTime FROM task ${whereClause} ORDER BY CreateTime DESC LIMIT ? OFFSET ?`;
+    const dataSql = `SELECT Id, TaskId, TaskName, Prototype, Status, ServerName, Workload, DATE_FORMAT(CreateTime, '%Y-%m-%d %H:%i:%s') AS CreateTime, DATE_FORMAT(UpdateTime, '%Y-%m-%d %H:%i:%s') AS UpdateTime FROM task ${whereClause} ORDER BY CreateTime DESC LIMIT ? OFFSET ?`;
     const countSql = `SELECT COUNT(*) AS total FROM task ${whereClause}`;
     const dataParams = [...params.queryParams, params.pageSize, offset];
     const [rows] = await pool.query(dataSql, dataParams);
@@ -30,23 +30,23 @@ class Task {
 
   static async createTask(task) {
     console.log(task)
-    const { TaskId, TaskName, Prototype, Status, Workload } = task;
+    const { TaskId, TaskName, Prototype, Status, Workload, ServerName } = task;
     const CreateTime = new Date();
     const UpdateTime = new Date();
     const [result] = await pool.query(
-      'INSERT INTO task (TaskId, TaskName, Prototype, Status, Workload, CreateTime, UpdateTime) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      [TaskId, TaskName, Prototype, Status, Workload, CreateTime, UpdateTime]
+      'INSERT INTO task (TaskId, TaskName, Prototype, Status, Workload, CreateTime, UpdateTime, ServerName) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+      [TaskId, TaskName, Prototype, Status, Workload, CreateTime, UpdateTime, ServerName]
     );
     
     return { Id: result.insertId, ...task, CreateTime, UpdateTime };
   }
 
   static async updateTask(task) {
-    const { Id, TaskId, TaskName, Prototype, Status, Workload } = task;
+    const { Id, TaskId, TaskName, Prototype, Status, Workload, ServerName } = task;
     const UpdateTime = new Date();
     const [result] = await pool.query(
-      'UPDATE task SET TaskId = ?, taskName = ?, Prototype = ?, Status = ?, Workload = ?, UpdateTime = ? WHERE Id = ?',
-      [TaskId, TaskName, Prototype, Status, Workload, UpdateTime, Id]
+      'UPDATE task SET TaskId = ?, taskName = ?, Prototype = ?, Status = ?, Workload = ?, UpdateTime = ?, ServerName = ? WHERE Id = ?',
+      [TaskId, TaskName, Prototype, Status, Workload, UpdateTime, ServerName, Id]
     );
     
     return result.affectedRows > 0;
